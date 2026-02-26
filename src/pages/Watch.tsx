@@ -124,6 +124,11 @@ export default function Watch() {
         </div>
       )}
 
+      <div className="absolute top-16 left-4 z-40 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
+        <p className="font-semibold">Episode: {currentEpisode.title}</p>
+        <p className="text-gray-300">Durasi: {currentEpisode.duration || '-'}</p>
+      </div>
+
       {/* Controls Overlay (Custom if needed, but ReactPlayer has controls) */}
       
       {/* Episode List Sidebar Toggle */}
