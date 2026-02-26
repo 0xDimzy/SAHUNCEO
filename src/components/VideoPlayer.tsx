@@ -160,9 +160,7 @@ export default function VideoPlayer({ url, onEnded, onProgress }: VideoPlayerPro
         ref={videoRef}
         className="w-full h-full"
         controls
-        controlsList="nodownload noplaybackrate noremoteplayback"
-        disablePictureInPicture
-        onContextMenu={(e) => e.preventDefault()}
+        controlsList="nodownload"
         playsInline
         autoPlay
         crossOrigin="anonymous"
