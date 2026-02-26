@@ -95,6 +95,38 @@ const dedupeDramas = (items: Drama[]) => {
   return filtered;
 };
 
+const formatDuration = (value: any): string => {
+  if (value === null || value === undefined) return '';
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const totalSeconds = Math.max(0, Math.floor(value));
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = String(totalSeconds % 60).padStart(2, '0');
+    return `${mins}:${secs}`;
+  }
+
+  const raw = String(value).trim();
+  if (!raw) return '';
+
+  // If API sends pure numeric string, treat as seconds.
+  if (/^\d+$/.test(raw)) {
+    const totalSeconds = Number(raw);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = String(totalSeconds % 60).padStart(2, '0');
+    return `${mins}:${secs}`;
+  }
+
+  return raw;
+};
+
+const normalizeEpisodeCount = (value: any): string => {
+  if (value === null || value === undefined) return '';
+  const raw = String(value).trim();
+  if (!raw) return '';
+  if (/^\d+(\.0+)?$/.test(raw)) return String(Math.floor(Number(raw)));
+  return raw;
+};
+
 export const normalizeDrama = (item: any): Drama => {
   if (!item) return {} as Drama;
 
@@ -166,15 +198,23 @@ export const normalizeDrama = (item: any): Drama => {
     bookId: id,
     title,
     poster,
-    duration: String(
+    duration: formatDuration(
       item.duration ||
         item.time ||
         item.videoDuration ||
         item.video_duration ||
         item.durationText ||
+        item.timeLength ||
+        item.playTime ||
+        item.play_time ||
+        item.totalDuration ||
+        item.total_duration ||
+        item.minutes ||
+        item.minute ||
+        item.video_time ||
         ''
-    ).trim(),
-    total_episode: String(
+    ),
+    total_episode: normalizeEpisodeCount(
       item.total_episode ||
         item.totalEpisode ||
         item.episode_count ||
@@ -186,8 +226,14 @@ export const normalizeDrama = (item: any): Drama => {
         item.shortPlayEpisodeCount ||
         item.shortPlayCount ||
         item.videosCount ||
+        item.videoCount ||
+        item.video_count ||
+        item.countEpisode ||
+        item.totalChapters ||
+        item.total_chapters ||
+        item.chapterTotal ||
         ''
-    ).trim(),
+    ),
     description:
       item.abstract ||
       item.introduction ||
