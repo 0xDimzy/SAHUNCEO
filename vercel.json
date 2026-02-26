@@ -4,20 +4,20 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/proxy/:path*",
-      "destination": "/api/proxy?path=:path*"
+      "source": "/api/proxy/(.*)",
+      "destination": "/api/proxy?path=$1"
     },
     {
-      "source": "/api/melolo/:path*",
-      "destination": "/api/melolo?path=:path*"
+      "source": "/api/melolo/(.*)",
+      "destination": "/api/melolo?path=$1"
     },
     {
-      "source": "/api/netshort/:path*",
-      "destination": "/api/netshort?path=:path*"
+      "source": "/api/netshort/(.*)",
+      "destination": "/api/netshort?path=$1"
     },
     {
-      "source": "/api/reelife/:path*",
-      "destination": "/api/reelife?path=:path*"
+      "source": "/api/reelife/(.*)",
+      "destination": "/api/reelife?path=$1"
     },
     {
       "source": "/((?!api/).*)",
