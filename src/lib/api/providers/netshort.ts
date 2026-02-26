@@ -1,6 +1,7 @@
-﻿import api from '../client';
+import api from '../client';
 import { normalizeDrama, normalizeNetshortList } from '../normalizers';
 import { API_CODE, Episode } from '../types';
+import { normalizePlaybackUrl } from '../url';
 
 const BASE = '/api/netshort';
 
@@ -152,8 +153,8 @@ export const netshortProvider = {
   async fetchVideoUrl(episodeId: string, bookId?: string) {
     if (!bookId) return '';
     const { data } = await api.get(`${BASE}/watch/${bookId}/${episodeId}?lang=in&code=${API_CODE}`);
-    if (typeof data === 'string') return data;
-    return (
+    if (typeof data === 'string') return normalizePlaybackUrl(data);
+    return normalizePlaybackUrl(
       data?.data?.playUrl ||
       data?.data?.url ||
       data?.data?.videoUrl ||
@@ -220,5 +221,6 @@ export const netshortProvider = {
     });
   },
 };
+
 
 
