@@ -1,6 +1,7 @@
-﻿import api from '../client';
+import api from '../client';
 import { normalizeDrama, normalizeMeloloList } from '../normalizers';
 import { API_CODE, Episode } from '../types';
+import { normalizePlaybackUrl } from '../url';
 
 const BASE = '/api/melolo';
 const HOME_CACHE_TTL_MS = 30_000;
@@ -94,7 +95,7 @@ export const meloloProvider = {
   },
   async fetchVideoUrl(episodeId: string, _bookId?: string) {
     const { data } = await api.get(`${BASE}/video/${episodeId}?lang=id&code=${API_CODE}`);
-    return data.data || data.results || data.url || '';
+    return normalizePlaybackUrl(data.data || data.results || data.url || '');
   },
   async fetchEpisodes(bookId: string): Promise<Episode[]> {
     const { data } = await api.get(`${BASE}/detail/${bookId}?lang=id&code=${API_CODE}`);
@@ -109,5 +110,6 @@ export const meloloProvider = {
     }));
   },
 };
+
 
 
