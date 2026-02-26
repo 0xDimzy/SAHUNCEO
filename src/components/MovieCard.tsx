@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Plus, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -15,8 +15,25 @@ export default function MovieCard({ drama }: MovieCardProps) {
   const { myList, addToList, removeFromList, isInList } = useStore();
   const dramaId = drama.bookId || drama.id;
   const isAdded = isInList(dramaId);
-  const episodeLabel = drama.total_episode && drama.total_episode !== '0' ? `${drama.total_episode} Eps` : 'Eps -';
-  const durationLabel = drama.duration && drama.duration !== '0' ? drama.duration : '-';
+  const rawDrama = drama as any;
+  const resolvedEpisode =
+    drama.total_episode ||
+    rawDrama.totalEpisode ||
+    rawDrama.episodeCount ||
+    rawDrama.episodesCount ||
+    rawDrama.shortPlayEpisodeCount ||
+    rawDrama.videoCount ||
+    '';
+  const resolvedDuration =
+    drama.duration ||
+    rawDrama.videoDuration ||
+    rawDrama.timeLength ||
+    rawDrama.playTime ||
+    rawDrama.durationText ||
+    '';
+
+  const episodeLabel = String(resolvedEpisode).trim() && String(resolvedEpisode) !== '0' ? `${resolvedEpisode} Eps` : 'Eps -';
+  const durationLabel = String(resolvedDuration).trim() && String(resolvedDuration) !== '0' ? String(resolvedDuration) : '-';
 
   const handleListToggle = (e: React.MouseEvent) => {
     e.preventDefault();
