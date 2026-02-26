@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Play, Plus, Check, Star, Calendar, Clock, ArrowLeft } from 'lucide-react';
+import { Play, Plus, Check, ArrowLeft } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { fetchDetail, fetchEpisodes, Drama, Episode } from '../lib/api';
@@ -54,8 +54,8 @@ export default function Detail() {
       
       <div className="flex-grow">
         {/* Hero Section */}
-        <div className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] w-full">
-          <div className="absolute inset-0">
+        <div className="relative h-[72vh] sm:h-[56vh] md:h-[60vh] w-full">
+          <div className="absolute inset-0 pointer-events-none">
             <img
               src={drama.poster}
               alt={drama.title}
@@ -63,18 +63,18 @@ export default function Detail() {
               referrerPolicy="no-referrer"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                if (!target.src.includes('picsum.photos')) {
-                  target.src = 'https://picsum.photos/1920/1080?text=Detail+Image+Error';
+                if (!target.src.includes('/images/placeholder-hero.svg')) {
+                  target.src = '/images/placeholder-hero.svg';
                 }
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
           </div>
           
-          <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full max-w-4xl">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">{drama.title}</h1>
+          <div className="absolute bottom-0 left-0 z-10 w-full max-w-4xl p-4 sm:p-8 md:p-12 pointer-events-auto">
+            <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-4">{drama.title}</h1>
             
-            <div className="flex items-center space-x-4 mb-6 text-sm md:text-base text-gray-300">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-6 text-xs sm:text-sm md:text-base text-gray-300">
               <span className="text-green-400 font-bold">98% Match</span>
               <span>{drama.release_date}</span>
               <span className="border border-gray-500 px-1 text-xs">HD</span>
@@ -82,31 +82,33 @@ export default function Detail() {
               <span>{drama.genre}</span>
             </div>
 
-            <div className="flex space-x-4 mb-8">
+            <div className="mb-6 flex flex-wrap gap-3">
               <Link
                 to={`/watch/${id}`}
-                className="flex items-center px-8 py-3 bg-white text-black rounded font-bold hover:bg-gray-200 transition"
+                className="w-full sm:w-auto min-h-11 touch-manipulation active:scale-95 flex items-center justify-center px-6 py-3 bg-white text-black rounded font-bold hover:bg-gray-200 transition"
               >
                 <Play className="w-5 h-5 mr-2 fill-black" />
                 Play
               </Link>
               <button
+                type="button"
                 onClick={() => navigate('/')}
-                className="flex items-center px-6 py-3 bg-gray-500/80 text-white rounded font-bold hover:bg-gray-500 transition"
+                className="w-full sm:w-auto min-h-11 touch-manipulation active:scale-95 flex items-center justify-center px-6 py-3 bg-gray-500/80 text-white rounded font-bold hover:bg-gray-500 transition"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Kembali
               </button>
               <button
+                type="button"
                 onClick={() => isAdded ? removeFromList(drama.bookId || drama.id) : addToList(drama)}
-                className="flex items-center px-8 py-3 bg-gray-600/80 text-white rounded font-bold hover:bg-gray-600 transition"
+                className="w-full sm:w-auto min-h-11 touch-manipulation active:scale-95 flex items-center justify-center px-6 py-3 bg-gray-600/80 text-white rounded font-bold hover:bg-gray-600 transition"
               >
                 {isAdded ? <Check className="w-5 h-5 mr-2" /> : <Plus className="w-5 h-5 mr-2" />}
                 My List
               </button>
             </div>
 
-            <p className="text-gray-300 text-lg line-clamp-3 max-w-2xl">{drama.description}</p>
+            <p className="text-gray-300 text-sm sm:text-lg line-clamp-3 max-w-2xl">{drama.description}</p>
           </div>
         </div>
 
