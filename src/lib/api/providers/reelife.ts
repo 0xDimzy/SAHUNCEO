@@ -1,6 +1,7 @@
-﻿import api from '../client';
+import api from '../client';
 import { normalizeDrama } from '../normalizers';
 import { API_CODE, Episode } from '../types';
+import { normalizePlaybackUrl } from '../url';
 
 const BASE = '/api/reelife';
 
@@ -124,8 +125,8 @@ const normalizeDuration = (duration: any) => {
 };
 
 const extractPlayableUrl = (data: any) => {
-  if (typeof data === 'string') return data;
-  return (
+  if (typeof data === 'string') return normalizePlaybackUrl(data);
+  return normalizePlaybackUrl(
     data?.data?.url ||
     data?.data?.playUrl ||
     data?.data?.play_url ||
@@ -209,14 +210,14 @@ export const reelifeProvider = {
   async fetchVideoUrl(episodeId: string, bookId?: string) {
     if (!bookId) return '';
     const playRes = await api.get(`${BASE}/play/${bookId}/${episodeId}?code=${API_CODE}&lang=in`).catch(() => null);
-    const playUrl = playRes?.data ? extractPlayableUrl(playRes.data) : '';
+    const playUrl = playRes?.data ? normalizePlaybackUrl(extractPlayableUrl(playRes.data)) : '';
     if (playUrl) return playUrl;
 
     const episodeRes = await api
       .get(`${BASE}/book/${bookId}/episode/${episodeId}?preload=3&code=${API_CODE}&lang=in`)
       .catch(() => null);
     if (!episodeRes?.data) return '';
-    return extractPlayableUrl(episodeRes.data);
+    return normalizePlaybackUrl(extractPlayableUrl(episodeRes.data));
   },
   async fetchEpisodes(bookId: string): Promise<Episode[]> {
     const { data } = await api.get(`${BASE}/book/${bookId}/chapters?lang=in`);
@@ -235,4 +236,5 @@ export const reelifeProvider = {
     });
   },
 };
+
 
