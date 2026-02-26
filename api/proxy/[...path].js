@@ -9,6 +9,12 @@ const toPath = (rawPath) => {
   return '';
 };
 
+const extractPathFromUrl = (url = '', prefix = '/api/proxy/') => {
+  const clean = String(url).split('?')[0];
+  if (!clean.startsWith(prefix)) return '';
+  return clean.slice(prefix.length);
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method Not Allowed' });
@@ -16,7 +22,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const endpoint = toPath(req.query.path);
+    const endpoint = toPath(req.query.path) || extractPathFromUrl(req.url, '/api/proxy/');
     if (!endpoint) {
       res.status(400).json({ error: 'Missing endpoint path' });
       return;
