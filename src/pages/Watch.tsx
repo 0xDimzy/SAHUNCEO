@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, SkipBack, SkipForward, List } from 'lucide-react';
 import VideoPlayer from '../components/VideoPlayer';
 import { fetchEpisodes, fetchVideoUrl, Episode } from '../lib/api';
+import { normalizePlaybackUrl } from '../lib/api/url';
 import { useStore } from '../store/useStore';
 
 export default function Watch() {
@@ -40,15 +41,15 @@ export default function Watch() {
             try {
               const url = await fetchVideoUrl(selectedEp.id, id);
               // Fallback to episode URL from list response if watch endpoint returns empty
-              setVideoUrl(url || selectedEp.url || '');
+              setVideoUrl(normalizePlaybackUrl(url || selectedEp.url || ''));
             } catch (error) {
               console.error('Failed to fetch direct video URL, using episode fallback URL', error);
-              setVideoUrl(selectedEp.url || '');
+              setVideoUrl(normalizePlaybackUrl(selectedEp.url || ''));
             } finally {
               setVideoLoading(false);
             }
           } else {
-            setVideoUrl(selectedEp.url);
+            setVideoUrl(normalizePlaybackUrl(selectedEp.url));
           }
         }
       } catch (error) {
