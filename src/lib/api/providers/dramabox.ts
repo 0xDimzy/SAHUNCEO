@@ -1,6 +1,7 @@
-﻿import api from '../client';
+import api from '../client';
 import { normalizeDrama, normalizeDramaboxList } from '../normalizers';
 import { API_CODE, Episode } from '../types';
+import { normalizePlaybackUrl } from '../url';
 
 const BASE = '/api/proxy';
 
@@ -64,10 +65,11 @@ export const dramaboxProvider = {
             const separator = videoUrl.includes('?') ? '&' : '?';
             videoUrl += `${separator}code=${API_CODE}`;
           }
-          return videoUrl;
+          return normalizePlaybackUrl(videoUrl);
         })(),
       };
     });
   },
 };
+
 
