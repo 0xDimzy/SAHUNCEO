@@ -1,31 +1,35 @@
 import axios from 'axios';
 
-const DRAMABOX_API_BASE = 'https://dramabox.dramabos.my.id/api/v1';
-const MELOLO_API_BASE = 'https://melolo.dramabos.my.id/api';
-const NETSHORT_API_BASE = 'https://netshort.dramabos.my.id/api';
-const REELIFE_API_BASE = 'https://reelife.dramabos.my.id/api/v1';
-
-const getApiKey = () => process.env.DRAMABOX_API_KEY || 'A179DA133C8F05A184D12D5823D8062A';
-
-const getProviderConfig = (provider) => {
-  switch (provider) {
-    case 'proxy':
-      return { baseUrl: DRAMABOX_API_BASE, apikeyHeader: true, ensureCode: false };
-    case 'melolo':
-      return { baseUrl: MELOLO_API_BASE, apikeyHeader: true, ensureCode: true };
-    case 'netshort':
-      return { baseUrl: NETSHORT_API_BASE, apikeyHeader: false, ensureCode: false };
-    case 'reelife':
-      return { baseUrl: REELIFE_API_BASE, apikeyHeader: false, ensureCode: false };
-    default:
-      return null;
-  }
-};
+const API_BASE = 'https://dramabox.dramabos.my.id/api/v1';
+const API_KEY = process.env.DRAMABOX_API_KEY || 'A179DA133C8F05A184D12D5823D8062A';
 
 const toPath = (rawPath) => {
   if (Array.isArray(rawPath)) return rawPath.join('/');
   if (typeof rawPath === 'string') return rawPath;
   return '';
+};
+
+const extractPathFromUrl = (url = '', prefix = '/api/proxy/') => {
+  const clean = String(url).split('?')[0];
+  if (!clean.startsWith(prefix)) return '';
+  return clean.slice(prefix.length);
+};
+
+const getEndpoint = (req) => {
+  const candidates = [
+    req.query?.path,
+    req.query?.['path*'],
+    req.query?.endpoint,
+    req.query?.slug,
+    req.query?.['...path'],
+  ];
+
+  for (const c of candidates) {
+    const p = toPath(c).trim();
+    if (p) return p;
+  }
+
+  return extractPathFromUrl(req.url, '/api/proxy/').trim();
 };
 
 export default async function handler(req, res) {
@@ -35,43 +39,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const provider = String(req.query.provider || '');
-    const endpoint = toPath(req.query.path);
-    const config = getProviderConfig(provider);
-
-    if (!config || !endpoint) {
-      res.status(400).json({ error: 'Invalid provider or endpoint path' });
+    const endpoint = getEndpoint(req);
+    if (!endpoint) {
+      res.status(400).json({ error: 'Missing endpoint path' });
       return;
     }
 
     const params = new URLSearchParams();
-    Object.entries(req.query).forEach(([key, value]) => {
-      if (key === 'provider' || key === 'path') return;
-      if (Array.isArray(value)) {
-        value.forEach((v) => params.append(key, String(v)));
-      } else if (value !== undefined) {
-        params.append(key, String(value));
-      }
+    Object.entries(req.query || {}).forEach(([key, value]) => {
+      if (key === 'path' || key === 'path*' || key === 'endpoint' || key === 'slug' || key === '...path') return;
+      if (Array.isArray(value)) value.forEach((v) => params.append(key, String(v)));
+      else if (value !== undefined) params.append(key, String(value));
     });
 
-    const apiKey = getApiKey();
-
-    if (provider === 'melolo' && !params.has('code')) {
-      params.append('code', apiKey);
-    }
-    if (provider === 'netshort' && endpoint.startsWith('watch/') && !params.has('code')) {
-      params.append('code', apiKey);
-    }
-    if (provider === 'reelife' && (endpoint.startsWith('play/') || endpoint.includes('/episode/')) && !params.has('code')) {
-      params.append('code', apiKey);
-    }
-
     const query = params.toString();
-    const url = `${config.baseUrl}/${endpoint}${query ? `?${query}` : ''}`;
+    const url = `${API_BASE}/${endpoint}${query ? `?${query}` : ''}`;
 
     const response = await axios.get(url, {
       timeout: 30000,
-      headers: config.apikeyHeader ? { apikey: apiKey } : undefined,
+      headers: { apikey: API_KEY },
     });
 
     res.status(response.status).json(response.data);
