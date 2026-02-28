@@ -47,6 +47,3 @@ This is a Netflix-style streaming application built with React, Vite, Tailwind C
 ## API
 
 The app uses a proxy server at `/api/proxy` to forward requests to the Dramabox API, keeping your API key secure.
-# SAHUNCEO
-# dramabox
-# dramabox
